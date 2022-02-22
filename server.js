@@ -22,28 +22,28 @@ const checkJwt = auth({
   issuerBaseURL: `https://${authConfig.domain}`
 });
 
-var AuthenticationClient = require('auth0').AuthenticationClient;
+// var AuthenticationClient = require('auth0').AuthenticationClient;
 
-var auth0 = new AuthenticationClient({
-domain: 'dev-9r54t9mj.us.auth0.com',
-  clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
-  clientSecret: 'U_U-oPp8UGGEsQN8K2bDe6FZRH2BXxXDDo3J1GRQpn2vdxD5T6ijeeuEJnhNwKcN',
-  scope: 'update:current_user_metadata'
-});
+// var auth0 = new AuthenticationClient({
+// domain: 'dev-9r54t9mj.us.auth0.com',
+//   clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
+//   clientSecret: '<CLIENT_SECRET>',
+//   scope: 'update:current_user_metadata'
+// });
 
-auth0.clientCredentialsGrant(
-  {
-    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
-  },
-  function (err, response) {
-    if (err) {
-      console.log(err);
-    }else{
-      AdminToken = response.access_token;
-      //console.log(response.access_token);
-  }
-  }
-);
+// auth0.clientCredentialsGrant(
+//   {
+//     audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
+//   },
+//   function (err, response) {
+//     if (err) {
+//       console.log(err);
+//     }else{
+//       AdminToken = response.access_token;
+//       //console.log(response.access_token);
+//   }
+//   }
+// );
 
 
 

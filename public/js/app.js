@@ -3,6 +3,7 @@ let auth0 = null;
 let auth_user = null;
 
 
+
 const fetchAuthConfig = () => fetch("/auth_config.json");
 
 const configureClient = async () => {
@@ -22,6 +23,12 @@ const configureClient = async () => {
     scope: "openid profile email read:current_user update:current_user_metadata"
   });
 };
+
+const differentAudienceOptions = {
+    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
+    scope: 'openid profile email read:current_user update:current_user_metadata'
+  };
+
 
 
 
@@ -57,11 +64,7 @@ const updateUI = async () => {
 
   document.getElementById("btn-logout").disabled = !isAuthenticated;
   document.getElementById("btn-login").disabled = isAuthenticated;
-
-  // NEW - enable the button to call the API
   document.getElementById("btn-call-api").disabled = !isAuthenticated;
-  document.getElementById("btn-call-user-api").disabled = !isAuthenticated;
-  //document.getElementById("btn-call-get-admin-token").disabled = !isAuthenticated;
   
   // NEW - add logic to show/hide gated content after authentication
   if (isAuthenticated) {
@@ -72,7 +75,7 @@ const updateUI = async () => {
     ).innerHTML = await auth0.getTokenSilently();
 
     document.getElementById("ipt-user-profile").textContent = JSON.stringify(
-      await auth0.getUserinfo
+      await auth0.getUser()
     );
 
   } else {
@@ -80,6 +83,8 @@ const updateUI = async () => {
   }
 };
 
+//method for ID token just in case
+ //await auth0.getIdTokenClaims()
 
 const login = async () => {
   await auth0.loginWithRedirect({
@@ -168,12 +173,14 @@ const SubmitOrderBackEnd = async (orderData) => {
 //update order history using auth managmenet api to add order to current_user metadata
 const SubmitOrder = async (orderData) => {
   try {
-
+    console.log(differentAudienceOptions);
+    const token = await auth0.getTokenWithPopup(differentAudienceOptions);
+    console.log("HERE");
     // append user_metadata parent JSON field
     orderData = { "user_metadata" : orderData};
     console.log(orderData);
     // Get the access token from the Auth0 client
-   const token = await auth_user.getTokenWithPopup();
+   //const token = await auth_user.getTokenWithPopup();
    
 
     // call auth0 user management API
@@ -223,10 +230,10 @@ function handleSubmit(event) {
     const value = Object.fromEntries(data.entries());
 
     //Submit to front end api call 
-    //SubmitOrder(value);
+    SubmitOrder(value);
 
     //Submit to backend 
-    SubmitOrderBackEnd(value);
+    //SubmitOrderBackEnd(value);
 
     //console.log({ value });
   };
@@ -237,3 +244,5 @@ function createEventListener(){
   const form = document.querySelector('#form');
   form.addEventListener('submit', handleSubmit);
 };
+
+

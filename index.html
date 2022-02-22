@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>SPA SDK Sample</title>
+    <title>Pizza 42 Demo</title>
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
   </head>
 
@@ -14,7 +14,7 @@
 
     <script src="js/app.js"></script>
 
-      <div class="hidden" id="gated-content">
+  <div class="hidden" id="gated-content">
     <p>
       You're seeing this content because you're currently
       <strong>logged in</strong>.
@@ -29,11 +29,25 @@
     </label>
   </div>
 
-  <button id="btn-call-api" disabled="true" onclick="callApi()">Call Api</button>
 
+
+  <form name="form" id="form">
+    <label for="sauce">Sauce</label>
+    <input type="text" name="sauce" id="sauce" />
+
+    <label for="toppings">Toppings</label>
+    <input type="text" name="toppings" id="toppings" />
+
+    <button type="submit">Order!</button>
+  </form>
+
+  <button id="btn-call-api" disabled="true" onclick="callApi()">Call Api</button>
+  <button id="btn-call-user-api" disabled="true" onclick="callUserManagementApi()">Call User Api</button>
   <!-- Add a container to hold the response from the call -->
   <pre id="api-call-result"></pre>
+  <pre id="api-call-result2"></pre>
 
     <script src="https://cdn.auth0.com/js/auth0-spa-js/1.13/auth0-spa-js.production.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
   </body>
 </html>

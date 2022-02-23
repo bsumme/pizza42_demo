@@ -3,7 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>Pizza 42 Demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
   </head>
 
@@ -15,7 +18,7 @@
     <div>
       <div class="container">
         <div class="logo">
-          <h1>Pizza 42 Homepage</h1>
+          <h1>Pizza 42 WebSite</h1>
         </div>
         <div class="menu">
           <ul>
@@ -27,26 +30,54 @@
       </div>
     </div>
 
-
-    <button id="btn-login" disabled="true" onclick="login()">Log in</button>
+    <div class="topcorner">
+    <button id="btn-login" disabled="true" onclick="login()" >Log in</button>
     <!-- <button id="btn-Silent-login"onclick="silentlogin()">Silent Log in</button> -->
     <button id="btn-logout" disabled="true" onclick="logout()">Log out</button>
-    
-    <div id="home-content">
-    <p> Welcome to the Pizza42 Website! Login and order now!</p>
     </div>
+
+    <div id="home-content">
+      <h3> Welcome to the Pizza42 Website! Login and order now!</h3>
+
+      <img src="https://cdn.pixabay.com/photo/2017/12/09/08/18/pizza-3007395_960_720.jpg" alt="Pizza Image" class="centerImg">
+     </div>
 
     <script src="js/app.js"></script>
 
-  <div class="hidden" id="profile-content">
-<!--     <label>
+<!--   <div class="hidden" id="profile-content">
+    <label>
       Access token:
       <pre id="ipt-access-token"></pre>
-    </label> -->
+    </label>
     <label>
       User profile:
       <pre id="ipt-user-profile"></pre>
-    </label>
+    </label> -->
+
+<div class="hidden" id="profile-content">
+          <div class="container">
+            <div class="row align-items-center profile-header">
+              <div class="auth-visible">
+                <img
+                  alt="User's profile picture"
+                  class="rounded-circle img-fluid profile-image mb-3 mb-md-0"
+                />
+              </div>
+              <div class="col-md">
+                <h2 class="user-name"></h2>
+                <p class="lead text-muted user-email"></p>
+              </div>
+            </div>
+            <div class="row">
+              <pre class="rounded">
+                <code id="profile-data" class="json"></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
   </div>
 
   <div class="hidden" id="order-content">
@@ -57,6 +88,7 @@
                     <label>Name</label>
                     <input type="text" class="form-control" name ="Name" id="name-textbox">
                   </div>
+            </div>
             <div class="form-row">
                   <label>Address</label>
                   <input type="text" class="form-control" name = "Address">
@@ -114,7 +146,7 @@
   <pre id="api-call-result2"></pre>
 
   <script src="https://cdn.auth0.com/js/auth0-spa-js/1.19/auth0-spa-js.production.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 
   </body>

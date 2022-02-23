@@ -60,10 +60,29 @@ const updateUI = async () => {
 
     // document.getElementById("ipt-access-token").innerHTML = await auth0.getTokenSilently();
 
-    document.getElementById("ipt-user-profile").textContent = JSON.stringify(userProfile);
+    //document.getElementById("ipt-user-profile").textContent = JSON.stringify(userProfile);
+    
+    //NEW PROFILE UPDATE
+    document.getElementById("profile-data").innerText = JSON.stringify(
+        userProfile,
+        null,
+        2
+      );
+
+     //document.querySelectorAll("pre code").forEach(hljs.highlightBlock);
+
+      eachElement(".profile-image", (e) => (e.src = userProfile.picture));
+      eachElement(".user-name", (e) => (e.innerText = userProfile.name));
+      eachElement(".user-email", (e) => (e.innerText = userProfile.email));
+      eachElement(".auth-invisible", (e) => e.classList.add("hidden"));
+      eachElement(".auth-visible", (e) => e.classList.remove("hidden"));
+
+
     document.getElementById('name-textbox').value = JSON.parse(JSON.stringify(userProfile)).name;
 
   } else {
+      eachElement(".auth-invisible", (e) => e.classList.remove("hidden"));
+      eachElement(".auth-visible", (e) => e.classList.add("hidden"));
     console.log("User is not Authenticated");
   }
 };
@@ -188,29 +207,28 @@ function createEventListeners(){
    document.getElementById("profile-content").classList.add("hidden");
    document.getElementById("home-content").classList.add("hidden");
    const isAuthenticated = await auth0.isAuthenticated();
-   const userProfile = await auth0.getUser();
-   const isUserEmailVerified = JSON.parse(JSON.stringify(userProfile)).email_verified;
-   console.log("UserEmailVerified:" + isUserEmailVerified);
+  
 
    if (!isAuthenticated){
     alert("Please login to place and order");
-   }else if(!isUserEmailVerified){
-    alert("Please verify your email before you can place an order");
-   }else{
-    document.getElementById("order-content").classList.remove("hidden");
+    return;
    }
+    const userProfile = await auth0.getUser();
+    const isUserEmailVerified = JSON.parse(JSON.stringify(userProfile)).email_verified;
+    if(!isUserEmailVerified){
+      alert("Please verify your email before you can place an order");
+      return
+    }
+     console.log("UserEmailVerified:" + isUserEmailVerified);
+     document.getElementById("order-content").classList.remove("hidden");
+   
 };
 
  showProfile = async () => {
    // clear other content 
    document.getElementById("order-content").classList.add("hidden");
    document.getElementById("home-content").classList.add("hidden");
-   const isAuthenticated = await auth0.isAuthenticated();
-   if (isAuthenticated){
    document.getElementById("profile-content").classList.remove("hidden");
-   }else{
-    alert("No user account logged in");
-   }
 };
 
 function formSubmit(event) {
@@ -229,4 +247,8 @@ function formSubmit(event) {
     console.log({ value })   
   };
 
-  
+  const eachElement = (selector, fn) => {
+  for (let e of document.querySelectorAll(selector)) {
+    fn(e);
+  }
+};

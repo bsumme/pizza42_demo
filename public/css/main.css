@@ -31,6 +31,7 @@ label {
   color: #ec953c;
 }
 h1 {text-align: center;}
+h3 {text-align: center;}
 
 .link { background:none; border:none;  
   font-size: 3vh;
@@ -40,3 +41,23 @@ h1 {text-align: center;}
   text-transform: uppercase;
   text-decoration: none;
   transition: ease-in-out 100ms; }
+
+  .center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+.centerImg {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.topcorner{
+   position:absolute;
+    top:80px;
+    right: 80px;
+
+  }

@@ -17,21 +17,7 @@ const configureClient = async () => {
     scope: "submit:orders"
   });
 
-  auth_user = await createAuth0Client({
-    domain: config.domain,
-    client_id: config.clientId,
-    audience: "https://dev-9r54t9mj.us.auth0.com/api/v2/",
-    scope: "openid profile email read:current_user update:current_user_metadata",
-  });
 };
-
-const differentAudienceOptions = {
-    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
-    scope: 'openid profile email read:current_user update:current_user_metadata',
-  };
-
-
-
 
 window.onload = async () => {
   await configureClient();
@@ -72,8 +58,8 @@ const updateUI = async () => {
     console.log("User Authenticated");
     const userProfile = await auth0.getUser();
 
-    document.getElementById("ipt-access-token").innerHTML = await auth0.getTokenSilently();
-//
+    // document.getElementById("ipt-access-token").innerHTML = await auth0.getTokenSilently();
+
     document.getElementById("ipt-user-profile").textContent = JSON.stringify(userProfile);
     document.getElementById('name-textbox').value = JSON.parse(JSON.stringify(userProfile)).name;
 
@@ -91,13 +77,6 @@ const login = async () => {
   });
 };
 
-const silentlogin = async () => {
-  const reponse = await fetch("https://dev-9r54t9mj.us.auth0.com/authorize?response_type=code&client_id=fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD&redirect_uri=http://localhost:3000&scope=openid&prompt=none")
-  const responseData = await response;
-  console.log("silent login" + responseData.json());
-
-};
-
 
 const logout = () => {
   auth0.logout({
@@ -105,57 +84,19 @@ const logout = () => {
   });
 };
 
-const callApi = async () => {
-  try {
-    // location.href = "https://dev-9r54t9mj.us.auth0.com/authorize?response_type=code&client_id=fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD&redirect_uri=http://localhost:3000&scope=openid";
-    // const queryString = window.location.search;
-    // console.log(queryString);
-
-    // Get the access token from the Auth0 client
-    const token = await auth0.getTokenSilently();
-
-    // Make the call to the API, setting the token
-    // in the Authorization header
-
-    
-    // TESTING WAYS TO GET USER MANAGMENT TOKEN
-    // const response2 = await fetch("/api/getAdminToken", {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`
-    //   }
-    // });
-
-    const response = await fetch("/api/external", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    // Fetch the JSON result
-    const responseData = await response.json();
-
-    // Display the result in the output element
-    const responseElement = document.getElementById("api-call-result");
-
-    responseElement.innerText = JSON.stringify(responseData, {}, 2);
-
-} catch (e) {
-    // Display errors in the console
-    console.error(e);
-  }
-};
-
 
 //submit order using custom API
 const submitOrderBackEnd = async (orderData) => {
   try {
 
+    // get user id to append to api call 
     const userProfile = await auth0.getUser();
     const user_id = JSON.parse(JSON.stringify(userProfile)).sub;
 
     // add user id to orderData to be sent to back end
+    var orderDatacopy = "";
+    orderDatacopy = JSON.stringify(orderData);
     orderData.userid = user_id;
-    try {
 
     // Get the access token from the Auth0 client
     const token = await auth0.getTokenSilently();
@@ -168,21 +109,14 @@ const submitOrderBackEnd = async (orderData) => {
         },
       body: JSON.stringify(orderData)
     })
-    // .then(response => response.json())
-    // .then(json => console.log(json));
 
     // Fetch the JSON result
     if(!response.ok){
-      alert("Not ok reponse");
+      alert("Bad Response when calling Order Submit API");
     }
     const responseData = await response;
     console.log(responseData.json());
-
-
-    } catch (e) {
-        // Display errors in the console
-        console.error(e);
-      }
+    alert(`Order placed. Order Details: ${orderDatacopy}`);
 
   } catch (e) {
     // Display errors in the console
@@ -196,14 +130,12 @@ const submitOrderBackEnd = async (orderData) => {
 //update order history using auth managmenet api to add order to current_user metadata
 const submitOrder = async (orderData) => {
   try {
-    console.log(differentAudienceOptions);
+    const differentAudienceOptions = {
+    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
+    scope: 'openid profile email read:current_user update:current_user_metadata',
+    };
     const token = await auth0.getTokenWithPopup(differentAudienceOptions);
-    //const token = await auth0.getTokenSilently(differentAudienceOptions);
-    // append user_metadata parent JSON field
-    //userMetadataOrderHistory = { "user_metadata" : orderData};
     console.log(orderData);
-    // Get the access token from the Auth0 client
-   //const token = await auth_user.getTokenWithPopup();
    
 
     // call auth0 user management API
@@ -222,17 +154,6 @@ const submitOrder = async (orderData) => {
     const responseData = await response.json();
     console.log(responseData);
 
-    const response2 = await fetch("https://dev-9r54t9mj.us.auth0.com/api/v2/users/auth0%7C620ca8160e408c006ab39806", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    if(!response2.ok){
-      alert("Not ok reponse");
-    }
-    const responseData2 = await response2.json();
-    console.log(responseData2);
     alert(`Order placed. Order Details: ${JSON.stringify(orderData)}`);
 
 
@@ -260,17 +181,12 @@ function createEventListeners(){
   const profileButton = document.getElementById("btn-show-user-profile");
   profileButton.addEventListener("click", showProfile);
 
-  const nameTextbox = document.getElementById('name-textbox');
-  nameTextbox.addEventListener("onchanged", populateName);
-
 };
 
-populateName = () => {
-  console.log("HERE");
-  document.getElementById('name-textbox').value = "BenTEST";
-}
-
   showOrderForm = async () => {
+    // clear other content 
+   document.getElementById("profile-content").classList.add("hidden");
+   document.getElementById("home-content").classList.add("hidden");
    const isAuthenticated = await auth0.isAuthenticated();
    const userProfile = await auth0.getUser();
    const isUserEmailVerified = JSON.parse(JSON.stringify(userProfile)).email_verified;
@@ -286,6 +202,9 @@ populateName = () => {
 };
 
  showProfile = async () => {
+   // clear other content 
+   document.getElementById("order-content").classList.add("hidden");
+   document.getElementById("home-content").classList.add("hidden");
    const isAuthenticated = await auth0.isAuthenticated();
    if (isAuthenticated){
    document.getElementById("profile-content").classList.remove("hidden");

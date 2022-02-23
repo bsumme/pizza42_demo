@@ -6,3 +6,37 @@ label {
   margin-bottom: 10px;
   display: block;
 }
+
+.menu{
+  text-align: center;
+  list-style: none;
+}
+.menu ul li{
+  display: inline-block;
+  padding: 1vh 4vh 0;
+}
+.menu ul li a{
+  font-size: 3vh;
+  color: white;
+  font-family: 'Quicksand';
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: ease-in-out 100ms;
+}
+.menu ul li a:hover{
+  color: #ec953c;
+}
+.menu ul li .active{
+  color: #ec953c;
+}
+h1 {text-align: center;}
+
+.link { background:none; border:none;  
+  font-size: 3vh;
+  color: #ec953c;
+  font-family: 'Quicksand';
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: ease-in-out 100ms; }

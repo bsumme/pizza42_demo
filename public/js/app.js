@@ -13,20 +13,21 @@ const configureClient = async () => {
   auth0 = await createAuth0Client({
     domain: config.domain,
     client_id: config.clientId,
-    audience: config.audience
+    audience: config.audience,
+    scope: "submit:orders"
   });
 
   auth_user = await createAuth0Client({
     domain: config.domain,
     client_id: config.clientId,
     audience: "https://dev-9r54t9mj.us.auth0.com/api/v2/",
-    scope: "openid profile email read:current_user update:current_user_metadata"
+    scope: "openid profile email read:current_user update:current_user_metadata",
   });
 };
 
 const differentAudienceOptions = {
     audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
-    scope: 'openid profile email read:current_user update:current_user_metadata'
+    scope: 'openid profile email read:current_user update:current_user_metadata',
   };
 
 
@@ -35,7 +36,7 @@ const differentAudienceOptions = {
 window.onload = async () => {
   await configureClient();
   updateUI();
-  createEventListener();
+  createEventListeners();
 
  const isAuthenticated = await auth0.isAuthenticated();
 
@@ -60,26 +61,24 @@ window.onload = async () => {
 
 
 const updateUI = async () => { 
+
   const isAuthenticated = await auth0.isAuthenticated();
 
   document.getElementById("btn-logout").disabled = !isAuthenticated;
   document.getElementById("btn-login").disabled = isAuthenticated;
-  document.getElementById("btn-call-api").disabled = !isAuthenticated;
   
   // NEW - add logic to show/hide gated content after authentication
   if (isAuthenticated) {
-    document.getElementById("gated-content").classList.remove("hidden");
+    console.log("User Authenticated");
+    const userProfile = await auth0.getUser();
 
-    document.getElementById(
-      "ipt-access-token"
-    ).innerHTML = await auth0.getTokenSilently();
-
-    document.getElementById("ipt-user-profile").textContent = JSON.stringify(
-      await auth0.getUser()
-    );
+    document.getElementById("ipt-access-token").innerHTML = await auth0.getTokenSilently();
+//
+    document.getElementById("ipt-user-profile").textContent = JSON.stringify(userProfile);
+    document.getElementById('name-textbox').value = JSON.parse(JSON.stringify(userProfile)).name;
 
   } else {
-    document.getElementById("gated-content").classList.add("hidden");
+    console.log("User is not Authenticated");
   }
 };
 
@@ -92,6 +91,14 @@ const login = async () => {
   });
 };
 
+const silentlogin = async () => {
+  const reponse = await fetch("https://dev-9r54t9mj.us.auth0.com/authorize?response_type=code&client_id=fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD&redirect_uri=http://localhost:3000&scope=openid&prompt=none")
+  const responseData = await response;
+  console.log("silent login" + responseData.json());
+
+};
+
+
 const logout = () => {
   auth0.logout({
     returnTo: window.location.origin
@@ -100,12 +107,24 @@ const logout = () => {
 
 const callApi = async () => {
   try {
+    // location.href = "https://dev-9r54t9mj.us.auth0.com/authorize?response_type=code&client_id=fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD&redirect_uri=http://localhost:3000&scope=openid";
+    // const queryString = window.location.search;
+    // console.log(queryString);
 
     // Get the access token from the Auth0 client
     const token = await auth0.getTokenSilently();
 
     // Make the call to the API, setting the token
     // in the Authorization header
+
+    
+    // TESTING WAYS TO GET USER MANAGMENT TOKEN
+    // const response2 = await fetch("/api/getAdminToken", {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`
+    //   }
+    // });
+
     const response = await fetch("/api/external", {
       headers: {
         Authorization: `Bearer ${token}`
@@ -128,10 +147,8 @@ const callApi = async () => {
 
 
 //submit order using custom API
-const SubmitOrderBackEnd = async (orderData) => {
+const submitOrderBackEnd = async (orderData) => {
   try {
-
-    alert(orderData);
     orderData = { "user_metadata" : orderData};
 
     try {
@@ -152,8 +169,7 @@ const SubmitOrderBackEnd = async (orderData) => {
 
     // Fetch the JSON result
     const responseData = await response;
-    const responseJson = await responseData.json();
-    console.log(responseJson);
+    console.log(responseData.json());
 
 
     } catch (e) {
@@ -171,13 +187,13 @@ const SubmitOrderBackEnd = async (orderData) => {
 
 
 //update order history using auth managmenet api to add order to current_user metadata
-const SubmitOrder = async (orderData) => {
+const submitOrder = async (orderData) => {
   try {
     console.log(differentAudienceOptions);
     const token = await auth0.getTokenWithPopup(differentAudienceOptions);
-    console.log("HERE");
+    //const token = await auth0.getTokenSilently(differentAudienceOptions);
     // append user_metadata parent JSON field
-    orderData = { "user_metadata" : orderData};
+    //userMetadataOrderHistory = { "user_metadata" : orderData};
     console.log(orderData);
     // Get the access token from the Auth0 client
    //const token = await auth_user.getTokenWithPopup();
@@ -190,7 +206,7 @@ const SubmitOrder = async (orderData) => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify( {"user_metadata" : orderData})
     });
     
     if(!response.ok){
@@ -210,6 +226,7 @@ const SubmitOrder = async (orderData) => {
     }
     const responseData2 = await response2.json();
     console.log(responseData2);
+    alert(`Order placed. Order Details: ${JSON.stringify(orderData)}`);
 
 
   } catch (e) {
@@ -222,7 +239,55 @@ const SubmitOrder = async (orderData) => {
 
 
 
-function handleSubmit(event) {
+
+
+
+function createEventListeners(){
+
+  const form = document.getElementById('Orderform');
+  form.addEventListener('submit', formSubmit);
+
+  const orderButton = document.getElementById("btn-show-order-form");
+  orderButton.addEventListener("click", showOrderForm);
+
+  const profileButton = document.getElementById("btn-show-user-profile");
+  profileButton.addEventListener("click", showProfile);
+
+  const nameTextbox = document.getElementById('name-textbox');
+  nameTextbox.addEventListener("onchanged", populateName);
+
+};
+
+populateName = () => {
+  console.log("HERE");
+  document.getElementById('name-textbox').value = "BenTEST";
+}
+
+  showOrderForm = async () => {
+   const isAuthenticated = await auth0.isAuthenticated();
+   const userProfile = await auth0.getUser();
+   const isUserEmailVerified = JSON.parse(JSON.stringify(userProfile)).email_verified;
+   console.log("UserEmailVerified:" + isUserEmailVerified);
+
+   if (!isAuthenticated){
+    alert("Please login to place and order");
+   }else if(!isUserEmailVerified){
+    alert("Please verify your email before you can place an order");
+   }else{
+    document.getElementById("order-content").classList.remove("hidden");
+   }
+};
+
+ showProfile = async () => {
+   const isAuthenticated = await auth0.isAuthenticated();
+   if (isAuthenticated){
+   document.getElementById("profile-content").classList.remove("hidden");
+   }else{
+    alert("No user account logged in");
+   }
+};
+
+function formSubmit(event) {
     event.preventDefault();
 
     const data = new FormData(event.target);
@@ -230,19 +295,12 @@ function handleSubmit(event) {
     const value = Object.fromEntries(data.entries());
 
     //Submit to front end api call 
-    SubmitOrder(value);
+    //submitOrder(value);
 
     //Submit to backend 
-    //SubmitOrderBackEnd(value);
+    submitOrderBackEnd(value);
 
-    //console.log({ value });
+    console.log({ value })   
   };
 
-
-function createEventListener(){
-
-  const form = document.querySelector('#form');
-  form.addEventListener('submit', handleSubmit);
-};
-
-
+  

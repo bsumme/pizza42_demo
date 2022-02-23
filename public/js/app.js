@@ -149,8 +149,12 @@ const callApi = async () => {
 //submit order using custom API
 const submitOrderBackEnd = async (orderData) => {
   try {
-    orderData = { "user_metadata" : orderData};
 
+    const userProfile = await auth0.getUser();
+    const user_id = JSON.parse(JSON.stringify(userProfile)).sub;
+
+    // add user id to orderData to be sent to back end
+    orderData.userid = user_id;
     try {
 
     // Get the access token from the Auth0 client
@@ -168,6 +172,9 @@ const submitOrderBackEnd = async (orderData) => {
     // .then(json => console.log(json));
 
     // Fetch the JSON result
+    if(!response.ok){
+      alert("Not ok reponse");
+    }
     const responseData = await response;
     console.log(responseData.json());
 

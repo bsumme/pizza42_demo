@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 let AdminToken = "";
 //test token from API Test Explorer
-let TestAdminToken="<PAST_TOKEN_HERE>"
+let TestAdminToken="<PASTE_TOKEN_HERE>"
 // create the JWT middleware
 
 const checkJwt = auth({
@@ -27,26 +27,26 @@ const checkScopes = requiredScopes('submit:orders');
 
 var AuthenticationClient = require('auth0').AuthenticationClient;
 
-var auth0 = new AuthenticationClient({
-domain: 'dev-9r54t9mj.us.auth0.com',
-  clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
-  clientSecret: 'CLIENT_SECRET',
-  scope: 'openid profile email read:current_user update:current_user_metadata'
-});
+// var auth0 = new AuthenticationClient({
+// domain: 'dev-9r54t9mj.us.auth0.com',
+//   clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
+//   clientSecret: 'CLIENT_SECRET',
+//   scope: 'openid profile email read:current_user update:current_user_metadata'
+// });
 
-auth0.clientCredentialsGrant(
-  {
-    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
-  },
-  function (err, response) {
-    if (err) {
-      console.log(err);
-    }else{
-      AdminToken = response.access_token;
-      //console.log(response.access_token);
-    }
-  }
-);
+// auth0.clientCredentialsGrant(
+//   {
+//     audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
+//   },
+//   function (err, response) {
+//     if (err) {
+//       console.log(err);
+//     }else{
+//       AdminToken = response.access_token;
+//       //console.log(response.access_token);
+//     }
+//   }
+// );
 
 
 
@@ -55,10 +55,14 @@ app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
 
 
   var order = req.body;
-  console.log(AdminToken);
+  userid = order.userid;
+  console.log(userid);
+  order = { "user_metadata" : order};
+  //console.log(AdminToken);
+  //console.log(order);
   var options = {
       method: 'PATCH',
-      url: 'https://dev-9r54t9mj.us.auth0.com/api/v2/users/auth0%7C620ca8160e408c006ab39806',
+      url: `https://dev-9r54t9mj.us.auth0.com/api/v2/users/${userid}`,
         headers: {authorization: `Bearer ${TestAdminToken}`, 'content-type': 'application/json'},
             data: order
     };
@@ -79,7 +83,7 @@ app.get("/api/getAdminToken", (req, res) => {
     method: 'POST',
     url: 'https://dev-9r54t9mj.us.auth0.com/oauth/token',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: '{"client_id":"yAvctZfZbm2WuKW9WuQQwAdGCp7gSNZk","client_secret":"cX7R_phG5QZ3_4jfvLusmcdXXWEUmi6-g6nYQZbF0W4mEwif7nVjeRJN_8ISWULg","audience":"https://dev-9r54t9mj.us.auth0.com/api/v2/","grant_type":"client_credentials"}'
+    body: '{"client_id":"yAvctZfZbm2WuKW9WuQQwAdGCp7gSNZk","client_secret":"CLIENT_SECRET","audience":"https://dev-9r54t9mj.us.auth0.com/api/v2/","grant_type":"client_credentials"}'
     };
 
     try{

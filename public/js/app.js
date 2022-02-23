@@ -94,8 +94,8 @@ const submitOrderBackEnd = async (orderData) => {
     const user_id = JSON.parse(JSON.stringify(userProfile)).sub;
 
     // add user id to orderData to be sent to back end
-    var orderDatacopy = "";
-    orderDatacopy = JSON.stringify(orderData);
+
+    const orderDatacopy = JSON.stringify(orderData);
     orderData.userid = user_id;
 
     // Get the access token from the Auth0 client

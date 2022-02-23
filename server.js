@@ -12,8 +12,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 let AdminToken = "";
-//test token from API Test Explorer
-let TestAdminToken="<PASTE_TOKEN_HERE>"
 // create the JWT middleware
 
 const checkJwt = auth({
@@ -27,28 +25,45 @@ const checkScopes = requiredScopes('submit:orders');
 
 var AuthenticationClient = require('auth0').AuthenticationClient;
 
-// var auth0 = new AuthenticationClient({
-// domain: 'dev-9r54t9mj.us.auth0.com',
-//   clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
-//   clientSecret: 'CLIENT_SECRET',
-//   scope: 'openid profile email read:current_user update:current_user_metadata'
-// });
 
-// auth0.clientCredentialsGrant(
-//   {
-//     audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
-//   },
-//   function (err, response) {
-//     if (err) {
-//       console.log(err);
-//     }else{
-//       AdminToken = response.access_token;
-//       //console.log(response.access_token);
-//     }
-//   }
-// );
+// get access token for use with Auth0 User Management API
+var auth0 = new AuthenticationClient({
+domain: 'dev-9r54t9mj.us.auth0.com',
+  clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
+  clientSecret: '<CLIENT_SECRET>',
+  scope: 'read:users_app_metadata update:users_app_metadata update:users'
+});
+
+auth0.clientCredentialsGrant(
+  {
+    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
+  },
+  function (err, response) {
+    if (err) {
+      console.log(err);
+    }else{
+      AdminToken = response.access_token;
+      console.log(response.access_token);
+    }
+  }
+);
+
+// var options = {
+//     method: 'POST',
+//     url: 'https://dev-9r54t9mj.us.auth0.com/oauth/token',
+//     headers: { 'content-type': 'application/x-www-form-urlencoded' },
+//     body: '{"client_id":"eobn8NS1cGR1rnQH2CyJbklfObOZm6bz","client_secret":"U_U-oPp8UGGEsQN8K2bDe6FZRH2BXxXDDo3J1GRQpn2vdxD5T6ijeeuEJnhNwKcN","audience":"https://dev-9r54t9mj.us.auth0.com/api/v2/","grant_type":"client_credentials","scope": "read:users_app_metadata update:users_app_metadata"}'
+//     };
 
 
+//     axios.request(options).then(function (response) {
+//       console.log(response.data);
+//       res.send({
+//         msg: "Admin token data: " + response.data
+//       });
+//     }).catch(function (error) {
+//       //console.error(error);
+//     });
 
 
 app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
@@ -58,12 +73,12 @@ app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
   userid = order.userid;
   console.log(userid);
   order = { "user_metadata" : order};
-  //console.log(AdminToken);
+  console.log(AdminToken);
   //console.log(order);
   var options = {
       method: 'PATCH',
       url: `https://dev-9r54t9mj.us.auth0.com/api/v2/users/${userid}`,
-        headers: {authorization: `Bearer ${TestAdminToken}`, 'content-type': 'application/json'},
+        headers: {authorization: `Bearer ${AdminToken}`, 'content-type': 'application/json'},
             data: order
     };
 
@@ -78,69 +93,7 @@ app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
 });
 
 
-app.get("/api/getAdminToken", (req, res) => {
-  var options = {
-    method: 'POST',
-    url: 'https://dev-9r54t9mj.us.auth0.com/oauth/token',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    body: '{"client_id":"yAvctZfZbm2WuKW9WuQQwAdGCp7gSNZk","client_secret":"CLIENT_SECRET","audience":"https://dev-9r54t9mj.us.auth0.com/api/v2/","grant_type":"client_credentials"}'
-    };
 
-    try{
-    axios.request(options).then(function (response) {
-      console.log(response.data);
-      res.send({
-        msg: "Admin token data: " + response.data
-      });
-    }).catch(function (error) {
-      console.error(error);
-    });
-  }catch(err){
-    console.error("SDFS" + error);
-  }
-
-
-});
-
-
-
-
-
-
-
-//Create an endpoint that uses the above middleware to
-//protect this route from unauthorized requests
-app.get("/api/external", checkJwt, checkScopes, (req, res) => {
-
-  //CODE FOR DOING SILENT LOGIN WITH URL CODES AND TOKENS
-//   var options = {
-//   method: 'POST',
-//   url: 'https://dev-9r54t9mj.us.auth0.com/oauth/token',
-//   headers: {'content-type': 'application/x-www-form-urlencoded'},
-//   data: {
-//     grant_type: 'authorization_code',
-//     client_id: 'fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD',
-//     client_secret: 'NsoEkSf7N1d33DSiX3LIPfb0fYY0sPUzk-dYyJZ_omAfcFFhQqTWa5kMMCvWHodm',
-//     code: 'yKrSxohPBJUv0_uVlh9KXOt13cZihossM3Dhc5v8uTdmO',
-//     redirect_uri: 'http://localhost:3000',
-//     scope: "openid profile email read:current_user update:current_user_metadata",
-//     audience: "https://benapi/api"
-//   }
-// };
-
-// axios.request(options).then(function (response) {
-//   console.log(response.data);
-//   res.send({
-//     msg: "Success!"
-//   });
-// }).catch(function (error) {
-//   console.error(error);
-// });
-
-  res.send({
-    msg: "Your access token was successfully validated!"
-  });
-});
 
 // Serve static assets from the /public folder
 app.use(express.static(join(__dirname, "public")));

@@ -107,18 +107,30 @@ const logout = () => {
 const submitOrderBackEnd = async (orderData) => {
   try {
 
-    // get user id to append to api call 
+    //format oderData
+    //todo: put this in separate function
+    var currentdate = new Date(); 
+    var datetime = currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+
+    //current date is set as the key for the order data
+    orderData = { [datetime] : orderData};
     const userProfile = await auth0.getUser();
     const user_id = JSON.parse(JSON.stringify(userProfile)).sub;
 
-    // add user id to orderData to be sent to back end
-
+    //copy orderData to be shown in alert
     const orderDatacopy = JSON.stringify(orderData);
-    orderData.userid = user_id;
+
+
+    // add user id to orderData to be sent to back end
+    orderData.userid = user_id;   
 
     // Get the access token from the Auth0 client
     const token = await auth0.getTokenSilently();
-
     const response = await fetch("/api/UpdateOrderHistory", {
       method: "POST",
       headers: {
@@ -144,47 +156,44 @@ const submitOrderBackEnd = async (orderData) => {
 
 };
 
-
-//update order history using auth managmenet api to add order to current_user metadata
-const submitOrder = async (orderData) => {
-  try {
-    const differentAudienceOptions = {
-    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
-    scope: 'openid profile email read:current_user update:current_user_metadata',
-    };
-    const token = await auth0.getTokenWithPopup(differentAudienceOptions);
-    console.log(orderData);
+//update order history using auth managemenet api to add order to current_user metadata
+// CURRENTLY UNUSED 
+// const submitOrder = async (orderData) => {
+//   try {
+//     const differentAudienceOptions = {
+//     audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/',
+//     scope: 'openid profile email read:current_user update:current_user_metadata',
+//     };
+//     const token = await auth0.getTokenWithPopup(differentAudienceOptions);
+//     console.log(orderData);
    
 
-    // call auth0 user management API
-    const response = await fetch("https://dev-9r54t9mj.us.auth0.com/api/v2/users/auth0%7C620ca8160e408c006ab39806", {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify( {"user_metadata" : orderData})
-    });
+//     // call auth0 user management API
+//     const response = await fetch("https://dev-9r54t9mj.us.auth0.com/api/v2/users/auth0%7C620ca8160e408c006ab39806", {
+//       method: 'PATCH',
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify( {"user_metadata" : orderData})
+//     });
     
-    if(!response.ok){
-      alert("Not ok reponse");
-    }
-    const responseData = await response.json();
-    console.log(responseData);
+//     if(!response.ok){
+//       alert("Not ok reponse");
+//     }
+//     const responseData = await response.json();
+//     console.log(responseData);
 
-    alert(`Order placed. Order Details: ${JSON.stringify(orderData)}`);
-
-
-  } catch (e) {
-    // Display errors in the console
-    alert(e.message);
-    console.error(e);
-  }
-
-};
+//     alert(`Order placed. Order Details: ${JSON.stringify(orderData)}`);
 
 
+//   } catch (e) {
+//     // Display errors in the console
+//     alert(e.message);
+//     console.error(e);
+//   }
 
+// };
 
 
 

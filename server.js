@@ -11,13 +11,17 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+//Admin Token that will be used in Auth0 User Management API calls
 let AdminToken = "";
+
 // create the JWT middleware
 
 const checkJwt = auth({
   audience: authConfig.audience,
   issuerBaseURL: `https://${authConfig.domain}`
 });
+
+// create Scope middleware
 
 const { requiredScopes } = require('express-oauth2-jwt-bearer');
 
@@ -28,15 +32,15 @@ var AuthenticationClient = require('auth0').AuthenticationClient;
 
 // get access token for use with Auth0 User Management API
 var auth0 = new AuthenticationClient({
-domain: 'dev-9r54t9mj.us.auth0.com',
-  clientId: 'eobn8NS1cGR1rnQH2CyJbklfObOZm6bz',
-  clientSecret: '<CLIENT_SECRET>',
+domain: authConfig.domain,
+  clientId: authConfig.APIclientId,
+  clientSecret: authConfig.APIclientSecret,
   scope: 'read:users_app_metadata update:users_app_metadata update:users'
 });
 
 auth0.clientCredentialsGrant(
   {
-    audience: 'https://dev-9r54t9mj.us.auth0.com/api/v2/'
+    audience: authConfig.Auth0UserAPI
   },
   function (err, response) {
     if (err) {
@@ -48,36 +52,18 @@ auth0.clientCredentialsGrant(
   }
 );
 
-// var options = {
-//     method: 'POST',
-//     url: 'https://dev-9r54t9mj.us.auth0.com/oauth/token',
-//     headers: { 'content-type': 'application/x-www-form-urlencoded' },
-//     body: '{"client_id":"eobn8NS1cGR1rnQH2CyJbklfObOZm6bz","client_secret":"U_U-oPp8UGGEsQN8K2bDe6FZRH2BXxXDDo3J1GRQpn2vdxD5T6ijeeuEJnhNwKcN","audience":"https://dev-9r54t9mj.us.auth0.com/api/v2/","grant_type":"client_credentials","scope": "read:users_app_metadata update:users_app_metadata"}'
-//     };
-
-
-//     axios.request(options).then(function (response) {
-//       console.log(response.data);
-//       res.send({
-//         msg: "Admin token data: " + response.data
-//       });
-//     }).catch(function (error) {
-//       //console.error(error);
-//     });
-
 
 app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
 
 
   var order = req.body;
   userid = order.userid;
-  console.log(userid);
   order = { "user_metadata" : order};
-  console.log(AdminToken);
+  //console.log(AdminToken);
   //console.log(order);
   var options = {
       method: 'PATCH',
-      url: `https://dev-9r54t9mj.us.auth0.com/api/v2/users/${userid}`,
+      url: `https://${authConfig.domain}/api/v2/users/${userid}`,
         headers: {authorization: `Bearer ${AdminToken}`, 'content-type': 'application/json'},
             data: order
     };

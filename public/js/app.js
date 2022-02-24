@@ -34,7 +34,6 @@ window.onload = async () => {
   // NEW - check for the code and state parameters
   const query = window.location.search;
   if (query.includes("code=") && query.includes("state=")) {
-
     // Process the login state
     await auth0.handleRedirectCallback();
     

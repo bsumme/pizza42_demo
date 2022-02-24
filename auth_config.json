@@ -1,5 +1,8 @@
 {
   "domain": "dev-9r54t9mj.us.auth0.com",
   "clientId": "fYdyZ2mvzu12ErThNrIirR08AJ7Px4wD",
-  "audience": "https://benapi/api"
+  "audience": "https://benapi/api",
+  "APIclientId": "yAvctZfZbm2WuKW9WuQQwAdGCp7gSNZk",
+  "APIclientSecret": "cX7R_phG5QZ3_4jfvLusmcdXXWEUmi6-g6nYQZbF0W4mEwif7nVjeRJN_8ISWULg",
+  "Auth0UserAPI" : "https://dev-9r54t9mj.us.auth0.com/api/v2/"
 }

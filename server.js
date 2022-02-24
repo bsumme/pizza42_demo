@@ -4,7 +4,6 @@ const { join } = require("path");
 const authConfig = require("./auth_config.json");
 const axios = require("axios").default;
 const bodyParser = require('body-parser');
-const cors = require('cors');
 
 const app = express();
 
@@ -47,12 +46,14 @@ auth0.clientCredentialsGrant(
       console.log(err);
     }else{
       AdminToken = response.access_token;
-      console.log(response.access_token);
+      //console.log(response.access_token);
     }
   }
 );
 
 
+
+//BENAPI CALL
 app.post("/api/UpdateOrderHistory", checkJwt, checkScopes, (req, res) => {
 
 
@@ -89,17 +90,10 @@ app.get("/auth_config.json", (req, res) => {
   res.sendFile(join(__dirname, "auth_config.json"));
 });
 
-// pizza test page
-app.get("/pizza", (_, res) => {
-  res.sendFile(join(__dirname, "pizza.html"));
-});
-
 // Serve the index page for all other requests
 app.get("/*", (_, res) => {
   res.sendFile(join(__dirname, "index.html"));
 });
-
-
 
 //Error Handler
 app.use(function(err, req, res, next) {

@@ -90,16 +90,26 @@ const updateUI = async () => {
  //await auth0.getIdTokenClaims()
 
 const login = async () => {
-  await auth0.loginWithRedirect({
-    redirect_uri: window.location.origin
-  });
+  try {
+    const options = {
+      redirect_uri: window.location.origin
+    };
+
+    await auth0.loginWithRedirect(options);
+  } catch (err) {
+    console.log("Log in failed", err);
+  }
 };
 
 
 const logout = () => {
+  try {
   auth0.logout({
     returnTo: window.location.origin
   });
+  } catch (err) {
+    console.log("Log Out failed", err);
+  }
 };
 
 
@@ -143,6 +153,7 @@ const submitOrderBackEnd = async (orderData) => {
     // Fetch the JSON result
     if(!response.ok){
       alert("Bad Response when calling Order Submit API");
+      return;
     }
     const responseData = await response;
     console.log(responseData.json());
@@ -150,7 +161,6 @@ const submitOrderBackEnd = async (orderData) => {
 
   } catch (e) {
     // Display errors in the console
-    alert(e.message);
     console.error(e);
   }
 
@@ -252,7 +262,7 @@ function formSubmit(event) {
     //Submit to backend 
     submitOrderBackEnd(value);
 
-    console.log({ value })   
+    //console.log({ value })   
   };
 
   const eachElement = (selector, fn) => {
